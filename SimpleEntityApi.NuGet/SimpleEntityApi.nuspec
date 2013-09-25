@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>SimpleEntityApi</id>
-    <version>0.2.2-rc1</version>
+    <version>0.2.3-rc1</version>
     <title>SimpleEntityApi</title>
     <authors>Daniel Root</authors>
     <owners>Daniel Root</owners>   
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides a generic implementation of WebAPI over an Entity Framework entity, and client javascript
     for using the api in grids and forms.</description>
-    <releaseNotes>Help endpoint, validation</releaseNotes>
+    <releaseNotes>Reorg scripts</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>WebAPI Entity-Framework</tags>
     <dependencies>

@@ -32,11 +32,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="content\Scripts\" />
     <Folder Include="lib\net40\" />
     <Folder Include="tools\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="content\Scripts\SimpleEntityApi-0.1.js" />
     <Content Include="NuGet.exe" />
   </ItemGroup>
   <ItemGroup>
