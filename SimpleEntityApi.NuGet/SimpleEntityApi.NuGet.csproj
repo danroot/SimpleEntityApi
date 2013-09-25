@@ -32,11 +32,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="content\Scripts\" />
     <Folder Include="lib\net40\" />
     <Folder Include="tools\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="content\Scripts\SimpleEntityApi.angular.js" />
+    <Content Include="content\Scripts\SimpleEntityApi.angular.min.js" />
+    <Content Include="content\Scripts\SimpleEntityApi.js" />
+    <Content Include="content\Scripts\SimpleEntityApi.min.js" />
     <Content Include="NuGet.exe" />
   </ItemGroup>
   <ItemGroup>
