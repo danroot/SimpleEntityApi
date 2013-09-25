@@ -1,7 +1,8 @@
 SimpleEntityApi
 ===============
 
-SimpleEntityApi provides a simple Web API over Entity Framework classes.
+SimpleEntityApi provides a simple Web API over Entity Framework classes, and javascript to help you consume your API in 
+grids and forms.
 
 Simplest thing that works:
 
