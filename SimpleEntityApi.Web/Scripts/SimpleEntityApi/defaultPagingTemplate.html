@@ -1,0 +1,14 @@
+﻿<div class="col-xs-2">
+    <select class="form-control" data-ng-options="size for size in grid.pagingOptions.pageSizes" data-ng-model="grid.pagingOptions.pageSize"></select>
+</div>
+<div class="col-xs-10">
+    <ul class="pagination" style="margin: 0;">
+        <li><a class="pointer" data-ng-click="grid.firstPage()">&lt;&lt;</a></li>
+        <li><a class="pointer" data-ng-click="grid.previousPage()">&lt;</a></li>
+        <li data-ng-repeat="page in grid.pagingOptions.pagerPages" data-ng-class="{active:page==grid.pagingOptions.currentPage}">
+            <a class="pointer" data-ng-click="grid.goToPage(page)">{{page}}</a>
+        </li>
+        <li><a class="pointer" data-ng-click="grid.nextPage()">&gt;</a></li>
+        <li><a class="pointer" data-ng-click="grid.lastPage()">&gt;&gt;</a></li>
+    </ul>
+</div>

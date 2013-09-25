@@ -1,0 +1,25 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".js" #>
+
+//Templates
+function addBootstrapGridTemplates($templateCache){
+<#
+EnvDTE.DTE dte = (EnvDTE.DTE) ((IServiceProvider) this.Host)
+                       .GetService(typeof(EnvDTE.DTE));
+
+ var files = System.IO.Directory.GetFiles(dte.ActiveDocument.Path,"*.html");
+ foreach(var fileName in files){
+	var file = new System.IO.FileInfo(fileName); 
+    var fixedupTemplate = file.OpenText().ReadToEnd();
+    fixedupTemplate = fixedupTemplate.Replace(Environment.NewLine,"").Replace("'","\\'");
+ #>
+ $templateCache.put('<#=file.Name#>','<#=fixedupTemplate#>');
+ <#
+ }
+#>
+}

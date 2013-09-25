@@ -1,0 +1,166 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+
+
+<h2>Index</h2>
+
+<div data-ng-app="" data-ng-controller="TodoController">
+    <div>
+        <button class="btn" data-ng-click="addABunch()">Add a bunch</button>
+        <input type="text" data-ng-model="newItem.Title" />
+        <button class="btn" data-ng-click="add()">Add</button>
+    </div>
+    <ul>
+        <li data-ng-repeat="item in items">
+            <input type="text" data-ng-model="item.Title" />
+            <a href="#" data-ng-click="update(item)">Save</a>
+            <a href="#" data-ng-click="delete(item)">Del</a>
+        </li>
+    </ul>
+
+    <ul class="pagination">
+        <li><a href="#" data-ng-click="firstPage()">&lt;&lt;</a></li>
+        <li><a href="#" data-ng-click="previousPage()">&lt;</a></li>
+        <li data-ng-repeat="page in pagerPages" data-ng-class="{active:page==currentPage}">
+            <a href="#" data-ng-click="goToPage(page)">{{page}}</a>
+        </li>
+        <li><a href="#" data-ng-click="nextPage()">&gt;</a></li>
+        <li><a href="#" data-ng-click="lastPage()">&gt;&gt;</a></li>
+    </ul>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script type="text/javascript">
+    function TodoController($scope, $http) {
+        var apiUrl = '@Url.Content("~/api/todoapi")';
+        $scope.addABunch = function () {
+            var toAdd = [];
+            for (var i = 0; i < 10; i++) {
+                toAdd.push({ Title: 'Item #' + i });
+            }
+            $scope.addMany(toAdd);
+        };
+        return new SimpleApiController(apiUrl, $scope, $http, { allowPaging: true });
+    }
+
+    function SimpleApiController(apiUrl, $scope, $http, options) {
+        options = options || {};
+        $scope.options = {
+            allowPaging: options.allowPaging || false
+        };
+
+
+        $scope.newItem = {};
+        $scope.items = [];
+        $scope.itemCount = -1;
+        $scope.currentPage = 1;
+        $scope.itemsPerPage = 10;
+        $scope.pageCount = -1;
+        $scope.pagerPages = [1];
+
+        $scope.loadNewItem = function () {
+            $http.get(apiUrl + '/new')
+                .success(function (data) {
+                    $scope.newItem = data;
+                });
+        };
+        $scope.addMany = function (items) {
+            return $http.post(apiUrl + '/many', items)
+              .success(function () {
+                  $scope.load();
+              });
+        };
+        $scope.add = function (item) {
+            var itemToAdd = item || $scope.newItem;
+
+            return $http.post(apiUrl, itemToAdd)
+                .success(function () {
+                    if (item == null) $scope.loadNewItem();
+                    $scope.load();
+                });
+        };
+        $scope.update = function (item) {
+            return $http.put(apiUrl, item)
+                 .success(function () {
+
+                 });
+        };
+        $scope.delete = function (item) {
+            return $http.delete(apiUrl, { data: item })
+                 .success(function () {
+                     var i = $scope.items.indexOf(item);
+                     if (i != -1) {
+                         $scope.items.splice(i, 1);
+                     }
+                 });
+        };
+        $scope.goToPage = function (page) {
+            $scope.currentPage = page;
+            $scope.load();
+        };
+        $scope.firstPage = function () {
+            $scope.currentPage = 1;
+            $scope.load();
+        };
+        $scope.nextPage = function () {
+            //TODO: limit;
+            $scope.currentPage = $scope.currentPage + 1;
+            $scope.load();
+        };
+        $scope.previousPage = function () {
+            //TODO: limit;
+            if ($scope.currentPage > 1) {
+                $scope.currentPage = $scope.currentPage - 1;
+                $scope.load();
+            }
+        };
+        $scope.lastPage = function () {
+            $scope.currentPage = $scope.pageCount;
+            $scope.load();
+        };
+        $scope.getPageInterval = function (currentPage, pagesToShow, pageCount) {
+            var halfPagesToShow = pagesToShow / 2;
+            return {
+                start: Math.ceil(currentPage > halfPagesToShow ? Math.max(Math.min(currentPage - halfPagesToShow, (pageCount - pagesToShow)), 1) : 1),
+                end: Math.ceil(currentPage > halfPagesToShow ? Math.min(currentPage + halfPagesToShow - 1, pageCount) : Math.min(pagesToShow, pageCount))
+            };
+        };
+        $scope.load = function () {
+            var urlParts = [];
+            if (options.allowPaging) {
+                urlParts.push('$inlinecount=allpages');
+                urlParts.push('$skip=' + (($scope.currentPage - 1) * $scope.itemsPerPage));
+                urlParts.push('$top=' + $scope.itemsPerPage);
+            }
+            var queryUrl = apiUrl + "/?" + urlParts.join('&');
+            return $http.get(queryUrl)
+                 .success(function (data) {
+                     $scope.items = data.Results;
+                     $scope.itemCount = data.Count;
+                     if (options.allowPaging) {
+                         $scope.pageCount = Math.ceil($scope.itemCount / $scope.itemsPerPage);
+                         $scope.pagerPages = [];
+
+                         var interval = $scope.getPageInterval($scope.currentPage, 10, $scope.pageCount);
+
+                         for (var i = interval.start; i <= interval.end; i++) {
+                             $scope.pagerPages.push(i);
+                         }
+
+                     }
+                 });
+        };
+        $scope.init = function () {
+            $http.defaults.headers.delete = { 'Content-Type': 'application/json' };
+
+
+            $scope.loadNewItem();
+            $scope.load();
+        };
+
+        $scope.init();
+    }
+</script>

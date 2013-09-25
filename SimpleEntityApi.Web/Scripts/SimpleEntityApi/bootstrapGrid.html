@@ -1,0 +1,35 @@
+﻿
+<div class="row">
+    <div class="col-xs-4 col-sm-8">
+        <span data-ng-include="grid.options.topButtonsTemplate"></span>
+        <span data-ng-show="grid.loading">Loading...</span>
+    </div>
+    <div class="col-xs-8 col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search" data-ng-model="grid.filterOptions.filterText" />
+            <span class="input-group-btn" data-ng-click="grid.load()">
+                <button class="btn btn-default">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </span>
+        </div>
+    </div>
+</div>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th style="width: 50px;"></th>
+            <th class="pointer" data-ng-repeat="col in grid.columnDefs" data-ng-click="grid.toggleSort(col.field)">{{col.displayName}} 
+                <span class="glyphicon" data-ng-class="{'glyphicon-chevron-up':grid.sort[col.field] == '', 'glyphicon-chevron-down':grid.sort[col.field] == 'desc'}"></span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr data-ng-repeat="item in grid.items">
+            <td data-ng-include="grid.options.rowButtonsTemplate"></td>
+            <td class="pointer" data-ng-repeat="col in grid.columnDefs" data-ng-click="grid.rowClick(item)">{{filterOrDefault(col,item)}}</td>
+        </tr>
+    </tbody>
+</table>
+<div class="row" data-ng-include="grid.options.pagingTemplate"></div>
+

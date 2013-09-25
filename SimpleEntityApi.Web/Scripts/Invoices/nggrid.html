@@ -1,0 +1,22 @@
+﻿<h2>Invoices</h2>
+<a href="#/bootstrap">Bootstrap</a>
+
+<div class="row">
+    <div class="col-xs-4 col-sm-8">
+        <a class="btn btn-primary" data-ng-click="beginNew()">New</a>
+        <span data-ng-show="loading">Loading...</span>
+    </div>
+    <div class="col-xs-8 col-sm-4">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search" data-ng-model="myGrid.filterOptions.filterText"/>
+            <span class="input-group-btn" data-ng-click="load()">
+                <button class="btn btn-default">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </span>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div data-ng-grid="myGrid" style="height:500px;"></div>
+</div>

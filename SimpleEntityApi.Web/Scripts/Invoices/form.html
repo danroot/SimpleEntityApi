@@ -1,0 +1,103 @@
+﻿<div class="row">
+    <form name="form" role="form">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-primary" data-ng-hide="invoice.isNew" data-ng-click="invoice.save()" data-ng-disabled="invoice.saving || form.$pristine || !form.$valid">Save</button>
+            <button type="button" class="btn btn-primary" data-ng-show="invoice.isNew" data-ng-click="invoice.save()" data-ng-disabled="invoice.saving || form.$pristine || !form.$valid">Add</button>
+            <button type="button" class="btn btn-default" data-ng-disabled="invoice.saving" data-ng-click="cancel()">Cancel</button>
+        </div>
+        <div class="col-md-12">
+            <div data-ng-show="invoice.loading">Loading invoice...</div>
+            <div data-ng-show="invoice.loading">Saving invoice...</div>
+            <div class="form-group" data-ng-class="{'has-error':!form.CustomerName.$valid}">
+                <label>Customer</label>
+                <input name="CustomerName" type="text" placeholder="Customer" class="form-control" data-ng-model="invoice.item.CustomerName" data-server-validate="invoice" />
+                <div class="has-error" data-ng-repeat="errorMessage in form.CustomerName.$error.server">{{errorMessage}}</div>
+            </div>
+            <div class="form-group" data-ng-class="{'has-error':!form.CustomerCompany.$valid}">
+                <label>Company</label>
+                <input name="CustomerCompany" type="text" placeholder="Company" class="form-control" data-ng-model="invoice.item.CustomerCompany" data-server-validate="invoice" />
+                <div class="has-error" data-ng-repeat="errorMessage in form.CustomerCompany.$error.server">{{errorMessage}}</div>
+            </div>
+            <label>Address</label>
+            <div class="form-group">
+                <input name="CustomerStreet1" type="text" placeholder="Street" class="form-control" data-ng-model="invoice.item.CustomerStreet1" data-server-validate="invoice" />
+                <div class="has-error" data-ng-repeat="errorMessage in form.CustomerStreet1.$error.server">{{errorMessage}}</div>
+            </div>
+            <div class="form-group">
+                <input type="text" placeholder="Street (continued)" class="form-control" data-ng-model="invoice.item.CustomerStreet2" />
+            </div>
+
+            <div class="row">
+                <div class="col-xs-8">
+                    <input type="text" placeholder="City" class="form-control" data-ng-model="invoice.item.CustomerCity" />
+                </div>
+                <div class="col-xs-2">
+                    <input type="text" placeholder="State" class="form-control" data-ng-model="invoice.item.CustomerState" />
+                </div>
+                <div class="col-xs-2">
+                    <input type="text" placeholder="Zip" class="form-control" data-ng-model="invoice.item.CustomerZip" />
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Sku</th>
+                            <th>Qty</th>
+                            <th>Description</th>
+                            <th>Unit Price</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="lineitem in invoice.item.LineItems" ng-form="lineItemsForm">
+                            <td>
+                                <span class="glyphicon glyphicon-remove" data-ng-click="removeLineItem($index)"></span>
+                            </td>
+                            <td>
+                                <input type="text" placeholder="Sku" class="form-control" data-ng-model="lineitem.Sku" /></td>
+                            <td>
+                                <input type="text" placeholder="Quantity" class="form-control" data-ng-model="lineitem.Quantity" data-ng-change="recalcTotals()" /></td>
+                            <td>
+                                <div class="form-group" data-ng-class="{'has-error':!lineItemsForm.Description.$valid}">
+                                    <input name="Description" type="text" placeholder="Description" class="form-control" data-ng-model="lineitem.Description" data-server-validate="invoice,item.LineItems[$index].Description" />
+                                    <div class="has-error" data-ng-repeat="errorMessage in lineItemsForm.Description.$error.server">{{errorMessage}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <input type="text" placeholder="Unit Price" class="form-control" data-ng-model="lineitem.UnitPrice" data-ng-change="recalcTotals()" /></td>
+                            <td>{{lineitem.Amount | number:2}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="6">
+                                <button type="button" class="btn btn-default" data-ng-click="addLineItem()">Add a Line Item</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <div class="col-md-9 form-group">
+                    <textarea placeholder="comments" class="form-control" data-ng-model="invoice.item.Comments" rows="3">
+
+                </textarea>
+                </div>
+                <div class="col-md-3">
+                    <label>Sub Total</label>
+                    <div>{{invoice.item.SubTotal | number:2}}</div>
+                    <label>Tax Rate</label><br />
+                    <input type="text" placeholder="Tax" class="form-control" data-ng-model="item.TaxRate" />
+                    <label>Tax</label>
+                    <div>{{invoice.item.Tax | number:2}}</div>
+                    <label>Total</label>
+                    <div>{{invoice.item.Total | number:2}}</div>
+                </div>
+            </div>
+        </div>
+         <div class="col-md-12">
+             <button type="button" class="btn btn-primary" data-ng-hide="invoice.isNew" data-ng-click="invoice.save()" data-ng-disabled="invoice.saving || form.$pristine || !form.$valid">Save</button>
+             <button type="button" class="btn btn-primary" data-ng-show="invoice.isNew" data-ng-click="invoice.save()" data-ng-disabled="invoice.saving || form.$pristine || !form.$valid">Add</button>
+            <button type="button" class="btn btn-default" data-ng-disabled="invoice.saving" data-ng-click="cancel()">Cancel</button>
+        </div>
+    </form>
+</div>

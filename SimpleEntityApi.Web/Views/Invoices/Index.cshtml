@@ -1,0 +1,232 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "";
+}
+<!DOCTYPE html>
+<html data-ng-app="invoicesApp">
+<head>
+    <title>Invoices</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Content/ng-grid.min.css" rel="stylesheet" />
+    @*    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">*@
+    <style>
+        .pointer {
+            cursor: pointer;
+        }
+
+        .table input[type=text] {
+            padding: 0;
+            margin: 0;
+        }
+
+        @@media print {
+            input[type=text] {
+                border: 0 transparent none;
+            }
+
+            .btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Project name</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li class="divider"></li>
+                            <li class="dropdown-header">Nav header</li>
+                            <li><a href="#">Separated link</a></li>
+                            <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="../navbar/">Default</a></li>
+                    <li><a href="../navbar-static-top/">Static top</a></li>
+                    <li class="active"><a href="./">Fixed top</a></li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </div>
+
+    <div class="container" data-ng-view="">
+    </div>
+
+
+    <script src="//code.jquery.com/jquery.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+    <script src="~/Scripts/ng-grid-2.0.7.min.js"></script>
+    <script src="~/Scripts/SimpleEntityApi/SimpleEntityApi-0.1.js"></script>
+
+    <script type="text/javascript">
+        var appRoot = '@Url.Content("~/")';
+        var app = angular
+            .module('invoicesApp', ['ngGrid', 'bootstrapGrid',  'serverValidate'])
+            .config(function ($routeProvider) {
+                $routeProvider
+                    .when('/nggrid', { controller: InvoiceListController, templateUrl: appRoot + 'Scripts/Invoices/nggrid.html' })
+                    .when('/bootstrap', { controller: InvoiceListController, templateUrl: appRoot + 'Scripts/Invoices/list.html' })
+                    .when('/edit/:id', { controller: InvoiceFormController, templateUrl: appRoot + 'Scripts/Invoices/form.html' })
+                    .when('/new', { controller: InvoiceFormController, templateUrl: appRoot + 'Scripts/Invoices/form.html' })
+                    .otherwise({ redirectTo: '/bootstrap' });
+            });
+
+
+        function InvoiceListController($scope, $http, $location) {
+            $scope.myGrid = new SimpleApiListSource(window.appRoot + 'api/invoicesapi', $http,
+                {
+                  
+                    allowPaging: true,
+                    pagingMode:'append',
+                    allowSorting: true,
+                    sort:{'CreatedDateUtc':'desc'},
+                    allowSearching: true,
+                    allowDelete: true,
+                    enableMetadataLookup: true,
+                    topButtonsTemplate: 'invoice_topbuttons.html',
+                    columnDefs: [{ field: 'CustomerName' },
+                        { field: 'Total' },
+                        { field: 'CreatedDateUtc' }],
+                    rowClick: function(item) { $location.path('/edit/' + item.Id); },    
+                });
+
+            $scope.beginNew = function () {
+                $location.path('/new');
+            };
+
+
+        }
+
+        function InvoiceFormController($scope, $http, $routeParams, $location) {
+            $scope.invoice = new SimpleApiFormSource(window.appRoot + 'api/invoicesapi', $http, $routeParams.id);
+            
+            $scope.invoice.onSave = function () {
+                $location.path('/');
+            };
+            $scope.cancel = function () {
+                $location.path('/');
+            };
+            $scope.recalcTotals = function () {
+
+                if ($scope.invoice.item == null) return;
+                if ($scope.invoice.item.LineItems == null) return;
+                var newTotal = 0;
+                for (var i = 0; i < $scope.invoice.item.LineItems.length; i++) {
+                    var lineItem = $scope.invoice.item.LineItems[i];
+                    if (lineItem.Quantity != null && lineItem.UnitPrice != null) {
+                        lineItem.Amount = parseFloat(lineItem.Quantity || 0) * parseFloat(lineItem.UnitPrice || 0);
+                    }
+                    newTotal = newTotal + parseFloat(lineItem.Amount || 0);
+                }
+                $scope.invoice.item.SubTotal = newTotal;
+                $scope.invoice.item.Tax = $scope.invoice.item.TaxRate * $scope.invoice.item.SubTotal;
+                $scope.invoice.item.Total = $scope.invoice.item.SubTotal + $scope.invoice.item.Tax;
+            };
+            $scope.addLineItem = function () {
+                $scope.invoice.item.LineItems.push({ Quantity: 0, UnitPrice: 0.0 });
+            };
+            $scope.removeLineItem = function (index) {
+                $scope.invoice.item.LineItems.splice(index, 1);
+            };
+
+             
+        }
+
+        function SimpleApiFormController(apiUrl, $scope, $http, $routeParams) {
+            $scope.modelState = {};
+            $scope.item = {};
+            $scope.loading = false;
+            $scope.saving = false;
+            $scope.isNew = false;
+            $scope.load = function () {
+
+                if ($routeParams.id != null) {
+                    $scope.getById();
+                    $scope.save = $scope.update;
+                    $scope.isNew = false;
+                } else {
+                    $scope.getNew();
+                    $scope.save = $scope.add;
+                    $scope.isNew = true;
+                }
+            };
+            $scope.getById = function () {
+
+                $scope.loading = true;
+                return $http.get(apiUrl + '/get?$filter=Id eq ' + $routeParams.id) //TODO: key not always Id=
+                    .success(function (data) {
+                        $scope.item = data.Results[0];
+                        $scope.loading = false;
+                    })
+                    .error(function () {
+                        $scope.loading = false;
+                    });
+            };
+
+            $scope.getNew = function () {
+                $http.get(apiUrl + '/new')
+                    .success(function (data) {
+                        $scope.item = data;
+                    });
+            };
+
+
+
+            $scope.update = function () {
+                $scope.saving = true;
+                return $http.put(apiUrl, $scope.item)
+                    .success(function (data) {
+                        $scope.modelState = {};
+                        $scope.item = data;
+                        $scope.saving = false;
+                        if ($scope.onSave) $scope.onSave();
+                    }).error(function (data) {
+                        $scope.modelState = data.ModelState;
+                        $scope.saving = false;
+                    });
+            };
+
+            $scope.add = function () {
+                $scope.saving = true;
+                return $http.post(apiUrl, $scope.item)
+                    .success(function (data) {
+                        $scope.modelState = {};
+                        $scope.item = data;
+                        $scope.saving = false;
+                        if ($scope.onSave) $scope.onSave();
+                    }).error(function (data) {
+                        $scope.modelState = data.ModelState;
+                        $scope.saving = false;
+                    });
+            };
+
+            $scope.load();
+        }
+
+    
+    </script>
+</body>
+</html>
+
