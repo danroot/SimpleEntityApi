@@ -12,14 +12,15 @@ Simplest thing that works:
      public class TodoController: SimpleEntityApi<Todo,int,TodoDbContext>{}
      ...
      //In WebApiConfig.cs:
-    SimpleEntityApiRoutes.RegisterRoutes(config, false);
+     SimpleEntityApiRoutes.RegisterRoutes(config, false);
 
 That's it!  Now you have an OData Web API endpoint for adding Todos!
 
-Also supports:
+Features:
 
 * RESTful Add/Edit/Delete
 * Validation returning ModelState errors
 * Before/After Intercepts
+* Javascript for hooking up Angular/Knockout/JQuery/VanillaJS
 
-Docs soon!
+more docs soon!
