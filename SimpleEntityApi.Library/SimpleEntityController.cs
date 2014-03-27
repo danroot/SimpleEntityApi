@@ -2,12 +2,32 @@
 using System.Data.Entity;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Web.Http.OData;
 using System.Web.Http.OData.Query;
 using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace SimpleEntityApi
 {
+    public abstract class AnyViewController : Controller
+    {
+        protected override void HandleUnknownAction(string actionName)
+        {
+            var result = new ViewResult() { ViewName = actionName };
+            if (result.ViewEngineCollection.FindView(this.ControllerContext, result.ViewName, result.MasterName).View == null)
+            {
+                base.HandleUnknownAction(actionName);
+            }
+            else
+            {
+                result.ExecuteResult(this.ControllerContext);
+            }
+            
+        }
+      
+    }
+
     public abstract class SimpleEntityController<T, TContext> : Controller
         where T : class, new()
         where TContext : DbContext, new()
